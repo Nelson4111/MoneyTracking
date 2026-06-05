@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<!--
+  MoneyTrack 2026 - GitHub Pages Single File
+  Dibuat dari Index.html + Style.html + Script.html.
+  PENTING:
+  - Cari MONEYTRACK_API_URL lalu isi dengan URL Web App Apps Script /exec.
+  - Backend Code.gs tetap berada di Apps Script.
+  - GitHub Pages hanya untuk frontend.
+-->
+
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#05070d">
+  <meta name="color-scheme" content="dark light">
+
+  <title>MoneyTrack 2026</title>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
+
+<!-- CSS -->
+<link rel="stylesheet" href="style.css?v=20260601-1">
+
+</head>
+
+<body class="login-mode">
+  <!-- Splash Screen -->
+  <div id="splash" class="splash">
+    <div class="splash-inner">
+      <div class="splash-logo"><i class="ri-wallet-3-line"></i></div>
+      <div class="splash-title">Money<span>Track</span></div>
+      <div class="splash-year">2026</div>
+      <div class="splash-bar"><div class="splash-bar-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- Login Page -->
+  <section id="loginPage" class="login-page hidden" aria-label="Halaman login">
+    <div class="login-bg" aria-hidden="true">
+      <div class="login-orb orb1"></div>
+      <div class="login-orb orb2"></div>
+      <div class="login-orb orb3"></div>
+      <div class="login-grid"></div>
+    </div>
+
+    <div id="loginCard" class="login-card">
+      <div class="login-brand">
+        <div class="login-icon"><i class="ri-wallet-3-line"></i></div>
+        <h1>Money<span>Track</span></h1>
+        <p>Kelola uang pribadi & bisnis dengan rapi.</p>
+      </div>
+
+      <div class="field-group">
+        <label for="inputUsername">Username</label>
+        <div class="field-wrap">
+          <i class="ri-user-3-line"></i>
+          <input id="inputUsername" type="text" autocomplete="username" placeholder="Masukkan username">
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label for="inputPassword">Password</label>
+        <div class="field-wrap">
+          <i class="ri-lock-2-line"></i>
+          <input id="inputPassword" type="password" autocomplete="current-password" placeholder="Masukkan password">
+          <button id="eyeBtn" class="eye-btn" type="button" onclick="togglePwd()" aria-label="Tampilkan atau sembunyikan password">
+            <i class="ri-eye-off-line"></i>
+          </button>
+        </div>
+      </div>
+
+      <button id="btnLogin" class="btn-login" type="button" onclick="doLogin()">
+        <span>Masuk</span>
+        <i class="ri-arrow-right-line"></i>
+      </button>
+
+      <div class="login-footer">MoneyTrack 2026 • Neon Finance Dashboard</div>
+    </div>
+  </section>
+
+  <!-- Fixed Top Navigation -->
+  <header id="topNav" class="top-nav hidden">
+    <div class="topnav-left">
+      <button id="topnavHamburger" class="topnav-hamburger" type="button" onclick="toggleSidebar()" aria-label="Buka atau tutup menu">
+        <span class="ham-line"></span>
+        <span class="ham-line"></span>
+        <span class="ham-line"></span>
+      </button>
+
+      <div class="topnav-brand" aria-label="MoneyTrack">
+        <i class="ri-wallet-3-line topnav-brand-icon"></i>
+        <div class="topnav-brand-text">Money<em>Track</em></div>
+      </div>
+    </div>
+
+    <div class="topnav-right">
+      <button id="topThemeBtn" class="topnav-icon-btn" type="button" onclick="toggleTopTheme()" title="Ganti Tema" aria-label="Ganti tema gelap atau terang">
+        <i id="topThemeIcon" class="ri-sun-line"></i>
+      </button>
+
+      <div class="topnav-user" onclick="toggleProfileDropdown(event)" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false" aria-label="Buka panel profil">
+        <div class="topnav-avatar-wrap">
+          <div id="topbarAvatar" class="topnav-avatar">?</div>
+          <span id="topnavStatusDot" class="topnav-status-dot"></span>
+        </div>
+        <div class="topnav-info">
+          <div id="topbarNama" class="topnav-name">-</div>
+          <div id="topbarRole" class="topnav-role">-</div>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <div id="profileDropdown" class="profile-dropdown hidden" onclick="event.stopPropagation()" aria-live="polite"></div>
+
+  <!-- Subscription Alerts -->
+  <div id="subscriptionBanner" class="subscription-banner hidden">
+    <div class="sub-banner-content">
+      <i class="ri-alert-line"></i>
+      <span id="subscriptionBannerText">Langganan akan habis.</span>
+      <a id="subscriptionWaBtnBanner" class="btn-wa-small" href="https://wa.me/6281241100804" target="_blank" rel="noopener">
+        <i class="ri-whatsapp-line"></i> Perpanjang
+      </a>
+    </div>
+  </div>
+
+  <div id="readOnlyBanner" class="read-only-banner hidden">
+    <div class="sub-banner-content">
+      <i class="ri-lock-line"></i>
+      <span>Mode lihat saja aktif. Input, edit, dan hapus dikunci.</span>
+      <a id="readOnlyWaBtn" class="btn-wa-small" href="https://wa.me/6281241100804" target="_blank" rel="noopener">
+        <i class="ri-whatsapp-line"></i> Hubungi Admin
+      </a>
+    </div>
+  </div>
+
+  <!-- App Shell -->
+  <main id="app" class="app hidden">
+    <!-- Sidebar Desktop / Tablet -->
+    <aside id="sidebar" class="sidebar compact" aria-label="Navigasi samping">
+      <nav class="sidebar-nav">
+        <div class="nav-item" data-page="dashboard" onclick="navigateTo('dashboard')">
+          <i class="ri-dashboard-3-line"></i><span>Dashboard</span>
+        </div>
+        <div class="nav-item" data-page="transaksi" onclick="navigateTo('transaksi')">
+          <i class="ri-exchange-line"></i><span>Transaksi</span>
+        </div>
+        <div class="nav-item" data-page="akun" onclick="navigateTo('akun')">
+          <i class="ri-bank-card-line"></i><span>Akun & Saldo</span>
+        </div>
+        <div class="nav-item" data-page="kategori" onclick="navigateTo('kategori')">
+          <i class="ri-price-tag-3-line"></i><span>Kategori</span>
+        </div>
+        <div class="nav-item" data-page="laporan" onclick="navigateTo('laporan')">
+          <i class="ri-bar-chart-2-line"></i><span>Laporan</span>
+        </div>
+        <div class="nav-item" data-page="budget" onclick="navigateTo('budget')">
+          <i class="ri-pie-chart-line"></i><span>Budget</span>
+        </div>
+        <div class="nav-item" data-page="pelanggan" onclick="navigateTo('pelanggan')">
+          <i class="ri-group-line"></i><span>Pelanggan</span>
+        </div>
+        <div class="nav-item" data-page="pembayaran" onclick="navigateTo('pembayaran')">
+          <i class="ri-secure-payment-line"></i><span>Pembayaran</span>
+        </div>
+        <div class="nav-item admin-only hidden" data-page="botlog" onclick="navigateTo('botlog')">
+          <i class="ri-terminal-box-line"></i><span>Bot Log</span>
+        </div>
+        <div class="nav-item" data-page="pengaturan" onclick="navigateTo('pengaturan')">
+          <i class="ri-settings-3-line"></i><span>Pengaturan</span>
+        </div>
+        <div class="nav-item admin-only hidden" data-page="adminsetting" onclick="navigateTo('adminsetting')">
+          <i class="ri-shield-user-line"></i><span>Admin Center</span>
+        </div>
+      </nav>
+    </aside>
+
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="closeSidebar()"></div>
+
+    <!-- Render Area -->
+    <section id="mainContent" class="main-content">
+      <div id="pageContent" class="page-content"></div>
+    </section>
+  </main>
+
+  <!-- Bottom Navigation: Mobile Only -->
+  <nav id="bottomNav" class="bottom-nav" aria-label="Navigasi bawah">
+    <div class="bn-item" data-page="dashboard" onclick="navigateTo('dashboard')">
+      <i class="ri-dashboard-3-line"></i><span>Home</span>
+    </div>
+    <div class="bn-item" data-page="transaksi" onclick="navigateTo('transaksi')">
+      <i class="ri-exchange-line"></i><span>Transaksi</span>
+    </div>  
+    <button class="bn-fab-add" type="button" onclick="modalTambahTransaksi()" aria-label="Tambah transaksi">
+      <i class="ri-add-line"></i>
+    </button>
+    <div class="bn-item" data-page="akun" onclick="navigateTo('akun')">
+  <i class="ri-bank-card-line"></i><span>Akun</span>
+</div>
+    <div class="bn-item" onclick="toggleBottomMore()">
+      <i class="ri-apps-2-line"></i><span>Lainnya</span>
+    </div>
+  </nav>
+
+  <!-- Mobile More Drawer Backdrop -->
+  <div id="bottomMoreBackdrop" class="bottom-more-backdrop hidden" onclick="tutupBottomMore()" aria-hidden="true"></div>
+
+  <!-- Mobile More Drawer -->
+  <div id="bottomMoreDrawer" class="bottom-more hidden" onclick="event.stopPropagation()">
+    <div class="bm-header">
+      <span>Menu Lainnya</span>
+      <button type="button" onclick="toggleBottomMore()" aria-label="Tutup menu lainnya"><i class="ri-close-line"></i></button>
+    </div>
+    <div class="bm-grid">
+      <div class="bm-item" data-page="kategori" onclick="navigateTo('kategori')">
+        <i class="ri-price-tag-3-line"></i><span>Kategori</span>
+      </div>
+      <div class="bm-item" data-page="laporan" onclick="navigateTo('laporan')">
+        <i class="ri-bar-chart-2-line"></i><span>Laporan</span>
+      </div>
+      <div class="bm-item" data-page="budget" onclick="navigateTo('budget')">
+        <i class="ri-pie-chart-line"></i><span>Budget</span>
+      </div>
+      <div class="bm-item" data-page="pelanggan" onclick="navigateTo('pelanggan')">
+        <i class="ri-group-line"></i><span>Pelanggan</span>
+      </div>
+      <div class="bm-item" data-page="pembayaran" onclick="navigateTo('pembayaran')">
+        <i class="ri-secure-payment-line"></i><span>Pembayaran</span>
+      </div>
+      <div class="bm-item admin-only hidden" data-page="botlog" onclick="navigateTo('botlog')">
+        <i class="ri-terminal-box-line"></i><span>Bot Log</span>
+      </div>
+      <div class="bm-item" data-page="pengaturan" onclick="navigateTo('pengaturan')">
+        <i class="ri-settings-3-line"></i><span>Pengaturan</span>
+      </div>
+      <div class="bm-item admin-only hidden" data-page="adminsetting" onclick="navigateTo('adminsetting')">
+        <i class="ri-shield-user-line"></i><span>Admin Center</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Music Button -->
+  <button id="musicFab" class="music-fab" type="button" onclick="toggleMusic()" title="Musik OFF — Klik untuk putar" aria-label="Nyalakan atau matikan musik">
+    <i id="musicFabIcon" class="ri-music-2-line"></i>
+  </button>
+  <audio id="appMusic" preload="none" loop></audio>
+
+  <!-- Global Modal -->
+  <div id="globalModal" class="modal-overlay hidden" onclick="closeModal(event)">
+    <div id="modalBox" class="modal-box" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 id="modalTitle">Modal</h3>
+        <button class="modal-close" type="button" onclick="closeModalDirect()" aria-label="Tutup modal">
+          <i class="ri-close-line"></i>
+        </button>
+      </div>
+      <div id="modalBody" class="modal-body"></div>
+      <div id="modalFooter" class="modal-footer"></div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  
+<script>
+window.MONEYTRACK_API_URL = 'https://script.google.com/macros/s/AKfycbzojQdRLNtnvZ6BPa41Xw7e_c97n8PevgbIEEZ29pPvFZiw-W34yCFDqsfZOZ1jk6U/exec';
+
+/* google.script.run ADAPTER */
+(function () {
+  function getApiUrl() {
+    return String(window.MONEYTRACK_API_URL || '').trim();
+  }
+
+  function buatRunner() {
+    var state = {
+      successHandler: null,
+      failureHandler: null
+    };
+
+    var runner = new Proxy({}, {
+      get: function (_, prop) {
+        if (prop === 'withSuccessHandler') {
+          return function (fn) {
+            state.successHandler = typeof fn === 'function' ? fn : null;
+            return runner;
+          };
+        }
+
+        if (prop === 'withFailureHandler') {
+          return function (fn) {
+            state.failureHandler = typeof fn === 'function' ? fn : null;
+            return runner;
+          };
+        }
+
+        if (prop === 'withUserObject') {
+          return function () {
+            return runner;
+          };
+        }
+
+        return function () {
+          var args = Array.prototype.slice.call(arguments);
+          var action = String(prop);
+          var apiUrl = getApiUrl();
+
+          if (!apiUrl || apiUrl === 'PASTE_APPS_SCRIPT_WEB_APP_URL_HERE') {
+            var errUrl = new Error('MONEYTRACK_API_URL belum diisi.');
+
+            if (state.failureHandler) {
+              state.failureHandler(errUrl);
+            } else {
+              console.error(errUrl);
+            }
+
+            if (typeof showToast === 'function') {
+              showToast('API URL belum diisi di index.html.', 'error');
+            }
+
+            return;
+          }
+
+          var mtToken = null;
+
+          if (typeof window.mtMulaiLoading === 'function') {
+            mtToken = window.mtMulaiLoading(action);
+          }
+
+          fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'text/plain;charset=utf-8'
+            },
+            body: JSON.stringify({
+              action: action,
+              args: args
+            })
+          })
+          .then(function (response) {
+            return response.text().then(function (text) {
+              if (!response.ok) {
+                throw new Error('HTTP ' + response.status + ': ' + text);
+              }
+
+              return text;
+            });
+          })
+          .then(function (text) {
+            if (state.successHandler) {
+              state.successHandler(text);
+            }
+          })
+          .catch(function (err) {
+            console.error('Gagal request API:', action, err);
+
+            if (state.failureHandler) {
+              state.failureHandler(err);
+            } else if (typeof showToast === 'function') {
+              showToast('Gagal terhubung ke API.', 'error');
+            }
+          })
+          .finally(function () {
+            if (typeof window.mtSelesaiLoading === 'function') {
+              window.mtSelesaiLoading(mtToken);
+            }
+          });
+        };
+      }
+    });
+
+    return runner;
+  }
+
+
+
+  window.google = window.google || {};
+  window.google.script = window.google.script || {};
+
+  Object.defineProperty(window.google.script, 'run', {
+    configurable: true,
+    get: function () {
+      return buatRunner();
+    }
+  });
+})();
+</script>
+
+<script src="script.js?v=20260601-1"></script>
+</body>
+</html>

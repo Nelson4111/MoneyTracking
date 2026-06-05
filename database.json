@@ -1,0 +1,323 @@
+{
+  "users": {
+    "16196267018@s.whatsapp.net": {
+      "exp": 21,
+      "limit": 100,
+      "balance": 0,
+      "totalDonasi": 0,
+      "lastclaim": 0,
+      "registered": false,
+      "name": "+1 619-626-7018",
+      "age": -1,
+      "regTime": -1,
+      "afk": -1,
+      "afkReason": "",
+      "banned": false,
+      "banReason": "",
+      "warn": 0,
+      "level": 0,
+      "role": "Free user",
+      "autolevelup": true
+    },
+    "6281241100804@s.whatsapp.net": {
+      "exp": 307,
+      "limit": 100,
+      "balance": 0,
+      "totalDonasi": 0,
+      "lastclaim": 0,
+      "registered": false,
+      "name": "nenel",
+      "age": -1,
+      "regTime": -1,
+      "afk": -1,
+      "afkReason": "",
+      "banned": false,
+      "banReason": "",
+      "warn": 0,
+      "level": 0,
+      "role": "Free user",
+      "autolevelup": true
+    },
+    "120363395114168746@newsletter": {
+      "exp": 7,
+      "limit": 100,
+      "balance": 0,
+      "totalDonasi": 0,
+      "lastclaim": 0,
+      "registered": false,
+      "age": -1,
+      "regTime": -1,
+      "afk": -1,
+      "afkReason": "",
+      "banned": false,
+      "banReason": "",
+      "warn": 0,
+      "level": 0,
+      "role": "Free user",
+      "autolevelup": true
+    },
+    "6285890671845@s.whatsapp.net": {
+      "exp": 3,
+      "limit": 100,
+      "balance": 0,
+      "totalDonasi": 0,
+      "lastclaim": 0,
+      "registered": false,
+      "name": "strakusa(1973)",
+      "age": -1,
+      "regTime": -1,
+      "afk": -1,
+      "afkReason": "",
+      "banned": false,
+      "banReason": "",
+      "warn": 0,
+      "level": 0,
+      "role": "Free user",
+      "autolevelup": true
+    }
+  },
+  "chats": {
+    "16196267018@s.whatsapp.net": {
+      "isBanned": false,
+      "welcome": true,
+      "detect": false,
+      "sWelcome": "",
+      "sBye": "",
+      "sPromote": "",
+      "sDemote": "",
+      "antiLink": false,
+      "antispam": false,
+      "viewonce": false,
+      "simi": false,
+      "autogpt": false,
+      "expired": 0,
+      "autoSticker": false,
+      "premium": false,
+      "premiumTime": false,
+      "nsfw": false,
+      "menu": true,
+      "onlyadmin": false,
+      "listrespon": {},
+      "produk": {},
+      "antiToxic": false
+    },
+    "6281241100804@s.whatsapp.net": {
+      "isBanned": false,
+      "welcome": true,
+      "detect": false,
+      "sWelcome": "",
+      "sBye": "",
+      "sPromote": "",
+      "sDemote": "",
+      "antiLink": false,
+      "antispam": false,
+      "viewonce": false,
+      "simi": false,
+      "autogpt": false,
+      "expired": 0,
+      "autoSticker": false,
+      "premium": false,
+      "premiumTime": false,
+      "nsfw": false,
+      "menu": true,
+      "onlyadmin": false,
+      "listrespon": {},
+      "produk": {},
+      "antiToxic": false
+    },
+    "62812411100804@s.whatsapp.net": {
+      "isBanned": false,
+      "welcome": true,
+      "detect": false,
+      "sWelcome": "",
+      "sBye": "",
+      "sPromote": "",
+      "sDemote": "",
+      "antiLink": false,
+      "antispam": false,
+      "viewonce": false,
+      "simi": false,
+      "autogpt": false,
+      "expired": 0,
+      "autoSticker": false,
+      "premium": false,
+      "premiumTime": false,
+      "nsfw": false,
+      "menu": true,
+      "onlyadmin": false,
+      "listrespon": {},
+      "produk": {},
+      "antiToxic": false
+    },
+    "120363395114168746@newsletter": {
+      "isBanned": false,
+      "welcome": true,
+      "detect": false,
+      "sWelcome": "",
+      "sBye": "",
+      "sPromote": "",
+      "sDemote": "",
+      "antiLink": false,
+      "antispam": false,
+      "viewonce": false,
+      "simi": false,
+      "autogpt": false,
+      "expired": 0,
+      "autoSticker": false,
+      "premium": false,
+      "premiumTime": false,
+      "nsfw": false,
+      "menu": true,
+      "onlyadmin": false,
+      "listrespon": {},
+      "produk": {}
+    },
+    "120363024948766379@g.us": {
+      "isBanned": false,
+      "welcome": true,
+      "detect": false,
+      "sWelcome": "",
+      "sBye": "",
+      "sPromote": "",
+      "sDemote": "",
+      "antiLink": false,
+      "antispam": false,
+      "viewonce": false,
+      "simi": false,
+      "autogpt": false,
+      "expired": 0,
+      "autoSticker": false,
+      "premium": false,
+      "premiumTime": false,
+      "nsfw": false,
+      "menu": true,
+      "onlyadmin": false,
+      "listrespon": {},
+      "produk": {}
+    }
+  },
+  "stats": {
+    "tes.js": {
+      "total": 2,
+      "success": 2,
+      "last": 1780640058913,
+      "lastSuccess": 1780640058913
+    },
+    "menu.js": {
+      "total": 3,
+      "success": 0,
+      "last": 1780640103059,
+      "lastSuccess": 0
+    },
+    "allmenu.js": {
+      "total": 2,
+      "success": 2,
+      "last": 1780640077917,
+      "lastSuccess": 1780640077917
+    },
+    "main-order.js": {
+      "total": 4,
+      "success": 4,
+      "last": 1780640618052,
+      "lastSuccess": 1780640618052
+    },
+    "store-verifikasiorder.js": {
+      "total": 3,
+      "success": 3,
+      "last": 1780640698202,
+      "lastSuccess": 1780640698202
+    },
+    "store-order-actions.js": {
+      "total": 4,
+      "success": 4,
+      "last": 1780640674336,
+      "lastSuccess": 1780640674336
+    }
+  },
+  "msgs": {},
+  "sticker": {},
+  "settings": {
+    "16196267018@s.whatsapp.net": {
+      "self": false,
+      "autoread": false,
+      "anticall": true,
+      "restartDB": 0,
+      "restrict": false,
+      "totalDonasi": 0
+    }
+  },
+  "nenelcraft": {
+    "orders": {
+      "INV-260605-141849-VX90": {
+        "invoiceId": "INV-260605-141849-VX90",
+        "namaUser": "nenel",
+        "nomorWa": "6281241100804",
+        "userJid": "6281241100804@s.whatsapp.net",
+        "tanggal": "2026-06-05",
+        "waktu": "2026-06-05T06:18:49.685Z",
+        "items": [
+          {
+            "nama": "Diamond Rank",
+            "qty": 1,
+            "hargaSatuan": 10000,
+            "total": 10000
+          },
+          {
+            "nama": "Joki FF",
+            "qty": 1,
+            "hargaSatuan": 20000,
+            "total": 20000
+          }
+        ],
+        "subtotal": 30000,
+        "diskon": 0,
+        "total": 30000,
+        "metodePembayaran": "QRIS",
+        "status": "Menunggu Pembayaran",
+        "catatan": "",
+        "sumberInput": "Bot WA",
+        "kategori": "Penjualan NenelCraft",
+        "akunTujuan": "QRIS",
+        "updatedAt": "2026-06-05T06:18:49.686Z"
+      },
+      "INV-260605-142325-MM6P": {
+        "invoiceId": "INV-260605-142325-MM6P",
+        "namaUser": "nenel",
+        "nomorWa": "6281241100804",
+        "userJid": "6281241100804@s.whatsapp.net",
+        "tanggal": "2026-06-05",
+        "waktu": "2026-06-05T06:23:25.167Z",
+        "items": [
+          {
+            "nama": "Diamond Rank",
+            "qty": 1,
+            "hargaSatuan": 10000,
+            "total": 10000
+          },
+          {
+            "nama": "Joki FF",
+            "qty": 1,
+            "hargaSatuan": 20000,
+            "total": 20000
+          }
+        ],
+        "subtotal": 30000,
+        "diskon": 0,
+        "total": 30000,
+        "metodePembayaran": "QRIS",
+        "status": "Lunas",
+        "catatan": "",
+        "sumberInput": "Bot WA",
+        "kategori": "Penjualan NenelCraft",
+        "akunTujuan": "QRIS",
+        "updatedAt": "2026-06-05T06:24:49.671Z",
+        "confirmedAt": "2026-06-05T06:24:26.180Z",
+        "rejectReason": ""
+      }
+    },
+    "confirmations": {},
+    "lastOrderByUser": {
+      "6281241100804@s.whatsapp.net": "INV-260605-142325-MM6P"
+    }
+  }
+}
