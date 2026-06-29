@@ -1762,6 +1762,29 @@ function botTambahTransaksiPribadi(nomorWa, data, apiKey) {
   }
 }
 
+function botTambahTransaksiAman(nomorWa, data, apiKey) {
+  try {
+    const hasil = botAmbilAkunByWa_(nomorWa, apiKey);
+    if (!hasil.ok) return balasJson("error", hasil.data || null, hasil.pesan);
+
+    data = data || {};
+    const jenisKeuangan = data.jenisKeuangan || "Pribadi";
+    if (!roleBolehJenisKeuangan(hasil.account.role, jenisKeuangan))
+      return balasJson(
+        "error",
+        null,
+        "Akun nomor ini tidak punya akses transaksi " + jenisKeuangan + ".",
+      );
+
+    data.username = hasil.account.username;
+    data.role = hasil.account.role;
+    data.jenisKeuangan = jenisKeuangan;
+    return tambahTransaksi(hasil.account.spreadsheetId, data);
+  } catch (e) {
+    return balasJson("error", null, e.message);
+  }
+}
+
 function botEditTransaksiPribadi(nomorWa, id, data, apiKey) {
   try {
     const hasil = botAmbilAkunByWa_(nomorWa, apiKey);
@@ -1973,17 +1996,40 @@ function botKonfirmasiPembayaran(spreadsheetId, data, apiKey) {
     const now = new Date().toISOString();
     const nomorWa = normalisasiNomorWa_(data.nomorWa || data.nomor || "");
     const pelangganId = cariAtauBuatPelangganBot_(spreadsheetId, data);
-    const total = mtAngka_(data.total || data.jumlah || data.nominal || 0);
+    let total = mtAngka_(data.total || data.jumlah || data.nominal || 0);
     const metode = String(data.metodePembayaran || data.metode || "Manual").trim();
-    const status = "Menunggu Verifikasi";
+    const status = statusPembayaranBot_(data.status || "Menunggu Verifikasi");
     const items = data.items || [];
     const trxRow = trxSheet ? cariRowSheet_(trxSheet, "Invoice ID", invoiceId) : null;
+    if (!total && trxRow) total = mtAngka_(trxRow.obj["Nominal"] || 0);
+
+    if (status === "Lunas" && !trxRow) {
+      return botUpsertOrder(
+        spreadsheetId,
+        Object.assign({}, data, {
+          invoiceId: invoiceId,
+          nomorWa: nomorWa,
+          metodePembayaran: metode,
+          status: status,
+          total: total,
+          items: items,
+        }),
+        apiKey,
+      );
+    }
 
     if (trxRow) {
       setObjekKeSheetRow_(trxSheet, trxRow.rowNumber, {
         Status: status,
         "Updated At": now,
       });
+      if (status === "Lunas") {
+        const trxObj = Object.assign({}, trxRow.obj, {
+          Status: status,
+          "Updated At": now,
+        });
+        prosesSaldoBotJikaPerlu_(spreadsheetId, trxSheet, trxRow, trxObj);
+      }
     }
 
     let payRow = cariRowSheet_(paySheet, "Invoice ID", invoiceId);
@@ -3637,6 +3683,7 @@ function doPost(e) {
       botKonfirmasiPembayaran: true,
       botUpdateOrderStatus: true,
       botTambahLog: true,
+      botTambahTransaksiAman: true,
       botTambahTransaksiPribadi: true,
       botEditTransaksiPribadi: true,
       botHapusTransaksiPribadi: true,

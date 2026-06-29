@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="alternate icon" href="favicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet">
 
 <!-- CSS -->
@@ -32,6 +32,18 @@
 </head>
 
 <body class="login-mode">
+
+  <!-- Video Background — fullscreen, fixed, autoplay, muted, loop -->
+  <div class="video-bg" aria-hidden="true">
+    <video id="videoDark" autoplay muted loop playsinline preload="auto">
+      <source src="Bacground_Malam.mp4" type="video/mp4">
+    </video>
+    <video id="videoLight" autoplay muted loop playsinline preload="auto">
+      <source src="Bacground_Sore.mp4" type="video/mp4">
+    </video>
+  </div>
+  <!-- Video Overlay — darkens/lightens based on theme -->
+  <div class="video-overlay" aria-hidden="true"></div>
   <!-- Splash Screen -->
   <div id="splash" class="splash">
     <div class="splash-inner">
@@ -172,6 +184,9 @@
         <div class="nav-item" data-page="pembayaran" onclick="navigateTo('pembayaran')">
           <i class="ri-secure-payment-line"></i><span>Pembayaran</span>
         </div>
+        <div class="nav-item" data-page="strukmanual" onclick="navigateTo('strukmanual')">
+          <i class="ri-receipt-line"></i><span>Struk Manual</span>
+        </div>
         <div class="nav-item admin-only hidden" data-page="botlog" onclick="navigateTo('botlog')">
           <i class="ri-terminal-box-line"></i><span>Bot Log</span>
         </div>
@@ -235,6 +250,9 @@
       </div>
       <div class="bm-item" data-page="pembayaran" onclick="navigateTo('pembayaran')">
         <i class="ri-secure-payment-line"></i><span>Pembayaran</span>
+      </div>
+      <div class="bm-item" data-page="strukmanual" onclick="navigateTo('strukmanual')">
+        <i class="ri-receipt-line"></i><span>Struk Manual</span>
       </div>
       <div class="bm-item admin-only hidden" data-page="botlog" onclick="navigateTo('botlog')">
         <i class="ri-terminal-box-line"></i><span>Bot Log</span>

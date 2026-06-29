@@ -453,19 +453,19 @@ window.mtSelesaiLoading = mtSelesaiLoading;
 // ============================================================
 var ROLE_RULES = {
 Admin: {
-  pages: ['dashboard','transaksi','akun','kategori','laporan','budget','pelanggan','pembayaran','botlog','pengaturan','adminsetting','kelolausers','settingweb','profil'],
+  pages: ['dashboard','transaksi','akun','kategori','laporan','budget','pelanggan','pembayaran','strukmanual','botlog','pengaturan','adminsetting','kelolausers','settingweb','profil'],
   jenisKeuangan: ['Pribadi','Bisnis']
 },
   UserBisnisPribadi: {
-    pages: ['dashboard','transaksi','akun','kategori','laporan','budget','pelanggan','pembayaran','pengaturan','profil'],
+    pages: ['dashboard','transaksi','akun','kategori','laporan','budget','pelanggan','pembayaran','strukmanual','pengaturan','profil'],
     jenisKeuangan: ['Pribadi','Bisnis']
   },
   UserBisnis: {
-    pages: ['dashboard','transaksi','akun','kategori','laporan','budget','pelanggan','pembayaran','pengaturan','profil'],
+    pages: ['dashboard','transaksi','akun','kategori','laporan','budget','pelanggan','pembayaran','strukmanual','pengaturan','profil'],
     jenisKeuangan: ['Bisnis']
   },
   UserPribadi: {
-    pages: ['dashboard','transaksi','akun','kategori','laporan','budget','pengaturan','profil'],
+    pages: ['dashboard','transaksi','akun','kategori','laporan','budget','strukmanual','pengaturan','profil'],
     jenisKeuangan: ['Pribadi']
   }
 };
@@ -1087,6 +1087,7 @@ function navigateTo(page) {
       case 'budget': renderBudget(); break;
       case 'pelanggan': renderPelanggan(); break;
       case 'pembayaran': renderPembayaran(); break;
+      case 'strukmanual': renderStrukManual(); break;
       case 'botlog': renderBotLog(); break;
       case 'pengaturan': renderPengaturan(); break;
       case 'adminsetting': renderAdminSetting(); break;
@@ -1161,6 +1162,7 @@ function refreshHalamanAktif() {
   if (p === 'budget') return loadBudget();
   if (p === 'pelanggan') return loadPelanggan();
   if (p === 'pembayaran') return loadPembayaran();
+  if (p === 'strukmanual') return renderStrukManual();
   if (p === 'botlog') return loadBotLog();
   if (p === 'settingweb') return loadSettingWeb();
   if (p === 'kelolausers') return loadUsers();
@@ -4060,6 +4062,484 @@ function simpanTransaksiDariStruk() {
       });
   }
   next();
+}
+
+var STRUK_MANUAL_ITEMS = [];
+
+function tanggalInputHariIni() {
+  var d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+function waktuInputSekarang() {
+  var d = new Date();
+  return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+
+function buatInvoiceStrukManual() {
+  var d = new Date();
+  return 'MT-' +
+    String(d.getFullYear()).slice(-2) +
+    String(d.getMonth() + 1).padStart(2, '0') +
+    String(d.getDate()).padStart(2, '0') +
+    '-' +
+    String(d.getHours()).padStart(2, '0') +
+    String(d.getMinutes()).padStart(2, '0') +
+    String(d.getSeconds()).padStart(2, '0');
+}
+
+function itemStrukManualDefault(nama, harga) {
+  return {
+    nama: nama || 'Item manual',
+    qty: 1,
+    hargaSatuan: harga || 0,
+    diskon: 0
+  };
+}
+
+function renderStrukManual() {
+  var content = document.getElementById('pageContent');
+  if (!content) return;
+
+  STRUK_MANUAL_ITEMS = [
+    itemStrukManualDefault('Produk contoh', 25000),
+    itemStrukManualDefault('Jasa / biaya tambahan', 10000)
+  ];
+
+  content.innerHTML =
+    '<div class="page-content fade-in manual-receipt-page">' +
+      '<div class="page-header">' +
+        '<div class="page-title"><i class="ri-receipt-line"></i> Struk Manual</div>' +
+        '<div class="page-actions">' +
+          '<button type="button" class="btn btn-secondary btn-sm" onclick="resetStrukManual()"><i class="ri-refresh-line"></i></button>' +
+          '<button type="button" class="btn btn-primary" onclick="downloadStrukManual()"><i class="ri-download-2-line"></i> Download</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="manual-receipt-layout">' +
+        '<section class="manual-receipt-panel">' +
+          '<div class="manual-receipt-panel-head">' +
+            '<div><strong>Data Nota</strong><span>Preview dan gambar dibuat di perangkat ini.</span></div>' +
+            '<span class="manual-receipt-badge"><i class="ri-database-2-line"></i> Tanpa DB</span>' +
+          '</div>' +
+          '<div class="form-row">' +
+            '<div class="form-group"><label>Nama Toko / Brand</label><input class="form-control" id="manualReceiptBrand" value="MoneyTrack Store" oninput="strukManualUpdatePreview()"></div>' +
+            '<div class="form-group"><label>Invoice</label><input class="form-control" id="manualReceiptInvoice" value="' + escapeHtmlAttr(buatInvoiceStrukManual()) + '" oninput="strukManualUpdatePreview()"></div>' +
+          '</div>' +
+          '<div class="form-row">' +
+            '<div class="form-group"><label>Tanggal</label><input type="date" class="form-control" id="manualReceiptDate" value="' + tanggalInputHariIni() + '" oninput="strukManualUpdatePreview()"></div>' +
+            '<div class="form-group"><label>Waktu</label><input type="time" class="form-control" id="manualReceiptTime" value="' + waktuInputSekarang() + '" oninput="strukManualUpdatePreview()"></div>' +
+          '</div>' +
+          '<div class="form-row">' +
+            '<div class="form-group"><label>Nama Pembeli</label><input class="form-control" id="manualReceiptCustomer" placeholder="Nama pembeli" oninput="strukManualUpdatePreview()"></div>' +
+            '<div class="form-group"><label>No. WA Pembeli</label><input class="form-control" id="manualReceiptWa" placeholder="62812..." inputmode="tel" oninput="strukManualUpdatePreview()"></div>' +
+          '</div>' +
+          '<div class="form-row">' +
+            '<div class="form-group"><label>Metode Pembayaran</label><input class="form-control" id="manualReceiptMethod" value="QRIS" oninput="strukManualUpdatePreview()"></div>' +
+            '<div class="form-group"><label>Status</label><select class="form-control" id="manualReceiptStatus" onchange="strukManualUpdatePreview()"><option value="Lunas" selected>Lunas</option><option value="Pending">Pending</option><option value="Belum Lunas">Belum Lunas</option></select></div>' +
+          '</div>' +
+          '<div class="manual-receipt-section-title">Item</div>' +
+          '<div id="manualReceiptItems" class="manual-receipt-items"></div>' +
+          '<div class="struk-add-manual">' +
+            '<div><strong>Tambah item</strong><span>Total nota dihitung otomatis dari semua item.</span></div>' +
+            '<button type="button" class="btn btn-secondary btn-sm" onclick="tambahItemStrukManualWeb()"><i class="ri-add-circle-line"></i> Tambah Item</button>' +
+          '</div>' +
+          '<div class="form-row manual-receipt-total-inputs">' +
+            '<div class="form-group"><label>Diskon Tambahan</label><input class="form-control nominal-rupiah" id="manualReceiptExtraDiscount" placeholder="Rp 0" inputmode="numeric" oninput="strukManualUpdatePreview()"></div>' +
+            '<div class="form-group"><label>Pajak / Biaya</label><input class="form-control nominal-rupiah" id="manualReceiptTax" placeholder="Rp 0" inputmode="numeric" oninput="strukManualUpdatePreview()"></div>' +
+          '</div>' +
+          '<div class="form-group"><label>Catatan</label><textarea class="form-control" id="manualReceiptNote" rows="3" placeholder="Catatan singkat di struk..." oninput="strukManualUpdatePreview()">Terima kasih.</textarea></div>' +
+        '</section>' +
+        '<section class="manual-receipt-preview-panel">' +
+          '<div class="manual-receipt-preview-head">' +
+            '<div><strong>Preview Gambar</strong><span id="manualReceiptSummary">Rp 0</span></div>' +
+            '<button type="button" class="btn btn-primary btn-sm" onclick="downloadStrukManual()"><i class="ri-download-2-line"></i> PNG</button>' +
+          '</div>' +
+          '<div class="manual-receipt-canvas-wrap">' +
+            '<canvas id="manualReceiptCanvas" width="1080" height="1200" aria-label="Preview struk manual"></canvas>' +
+          '</div>' +
+        '</section>' +
+      '</div>' +
+    '</div>';
+
+  renderStrukManualItems();
+  setupInputRupiah('manualReceiptExtraDiscount');
+  setupInputRupiah('manualReceiptTax');
+  setTimeout(strukManualUpdatePreview, 40);
+}
+
+function renderStrukManualItems() {
+  var wrap = document.getElementById('manualReceiptItems');
+  if (!wrap) return;
+  wrap.innerHTML = (STRUK_MANUAL_ITEMS || []).map(function(item, i) {
+    return '<div class="manual-receipt-item" data-index="' + i + '">' +
+      '<div class="struk-item-toolbar">' +
+        '<span>Item ' + (i + 1) + '</span>' +
+        '<button type="button" class="struk-item-remove" onclick="hapusItemStrukManualWeb(' + i + ')" title="Hapus item"><i class="ri-delete-bin-line"></i> Hapus</button>' +
+      '</div>' +
+      '<div class="form-row">' +
+        '<div class="form-group"><label>Nama Item</label><input class="form-control" id="manualReceiptItemName_' + i + '" value="' + escapeHtmlAttr(item.nama) + '" oninput="strukManualUpdatePreview()"></div>' +
+        '<div class="form-group small"><label>Qty</label><input class="form-control" id="manualReceiptItemQty_' + i + '" value="' + escapeHtmlAttr(formatQtyStruk(item.qty || 1)) + '" inputmode="decimal" oninput="strukManualUpdatePreview()"></div>' +
+      '</div>' +
+      '<div class="form-row">' +
+        '<div class="form-group"><label>Harga Satuan</label><input class="form-control nominal-rupiah" id="manualReceiptItemPrice_' + i + '" value="' + escapeHtmlAttr(formatNominalInput(item.hargaSatuan)) + '" inputmode="numeric" oninput="strukManualUpdatePreview()"></div>' +
+        '<div class="form-group"><label>Diskon Item</label><input class="form-control nominal-rupiah" id="manualReceiptItemDiscount_' + i + '" value="' + escapeHtmlAttr(formatNominalInput(item.diskon)) + '" inputmode="numeric" oninput="strukManualUpdatePreview()"></div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  (STRUK_MANUAL_ITEMS || []).forEach(function(_, i) {
+    setupInputRupiah('manualReceiptItemPrice_' + i);
+    setupInputRupiah('manualReceiptItemDiscount_' + i);
+  });
+}
+
+function bacaItemsStrukManual() {
+  if (!Array.isArray(STRUK_MANUAL_ITEMS)) STRUK_MANUAL_ITEMS = [];
+  STRUK_MANUAL_ITEMS = STRUK_MANUAL_ITEMS.map(function(item, i) {
+    var namaEl = document.getElementById('manualReceiptItemName_' + i);
+    var qtyEl = document.getElementById('manualReceiptItemQty_' + i);
+    var priceEl = document.getElementById('manualReceiptItemPrice_' + i);
+    var discountEl = document.getElementById('manualReceiptItemDiscount_' + i);
+    var qty = qtyEl ? angkaQtyStruk(qtyEl.value) : angkaQtyStruk(item.qty);
+    var harga = priceEl ? angkaNominal(priceEl.value) : angkaNominal(item.hargaSatuan);
+    var diskon = discountEl ? angkaNominal(discountEl.value) : angkaNominal(item.diskon);
+    var subtotal = Math.round(qty * harga);
+    var total = Math.max(0, subtotal - diskon);
+    return {
+      nama: namaEl ? namaEl.value : item.nama,
+      qty: qty,
+      hargaSatuan: harga,
+      diskon: Math.min(diskon, subtotal),
+      subtotal: subtotal,
+      total: total
+    };
+  });
+  return STRUK_MANUAL_ITEMS;
+}
+
+function bacaDataStrukManual() {
+  var items = bacaItemsStrukManual().filter(function(item) {
+    return String(item.nama || '').trim() || item.hargaSatuan || item.total;
+  });
+  var subtotal = items.reduce(function(sum, item) { return sum + angkaNominal(item.subtotal); }, 0);
+  var diskonItem = items.reduce(function(sum, item) { return sum + angkaNominal(item.diskon); }, 0);
+  var diskonTambahan = angkaNominal(document.getElementById('manualReceiptExtraDiscount') ? document.getElementById('manualReceiptExtraDiscount').value : 0);
+  var pajak = angkaNominal(document.getElementById('manualReceiptTax') ? document.getElementById('manualReceiptTax').value : 0);
+  var total = Math.max(0, subtotal - diskonItem - diskonTambahan + pajak);
+  return {
+    brand: document.getElementById('manualReceiptBrand') ? document.getElementById('manualReceiptBrand').value : 'MoneyTrack Store',
+    invoiceId: document.getElementById('manualReceiptInvoice') ? document.getElementById('manualReceiptInvoice').value : '',
+    tanggal: document.getElementById('manualReceiptDate') ? document.getElementById('manualReceiptDate').value : tanggalInputHariIni(),
+    waktu: document.getElementById('manualReceiptTime') ? document.getElementById('manualReceiptTime').value : waktuInputSekarang(),
+    pelanggan: document.getElementById('manualReceiptCustomer') ? document.getElementById('manualReceiptCustomer').value : '',
+    nomorWa: document.getElementById('manualReceiptWa') ? document.getElementById('manualReceiptWa').value : '',
+    metode: document.getElementById('manualReceiptMethod') ? document.getElementById('manualReceiptMethod').value : '',
+    status: document.getElementById('manualReceiptStatus') ? document.getElementById('manualReceiptStatus').value : 'Lunas',
+    catatan: document.getElementById('manualReceiptNote') ? document.getElementById('manualReceiptNote').value : '',
+    items: items,
+    subtotal: subtotal,
+    diskonItem: diskonItem,
+    diskonTambahan: diskonTambahan,
+    diskon: diskonItem + diskonTambahan,
+    pajak: pajak,
+    total: total
+  };
+}
+
+function tambahItemStrukManualWeb() {
+  bacaItemsStrukManual();
+  STRUK_MANUAL_ITEMS.push(itemStrukManualDefault('Item baru', 0));
+  renderStrukManualItems();
+  strukManualUpdatePreview();
+  setTimeout(function() {
+    var idx = STRUK_MANUAL_ITEMS.length - 1;
+    var el = document.getElementById('manualReceiptItemName_' + idx);
+    if (el) {
+      el.focus();
+      el.select();
+    }
+  }, 40);
+}
+
+function hapusItemStrukManualWeb(index) {
+  bacaItemsStrukManual();
+  STRUK_MANUAL_ITEMS.splice(index, 1);
+  if (!STRUK_MANUAL_ITEMS.length) STRUK_MANUAL_ITEMS.push(itemStrukManualDefault('Item manual', 0));
+  renderStrukManualItems();
+  strukManualUpdatePreview();
+}
+
+function resetStrukManual() {
+  renderStrukManual();
+  showToast('Struk manual direset.', 'info');
+}
+
+function strukManualUpdatePreview() {
+  var canvas = document.getElementById('manualReceiptCanvas');
+  if (!canvas) return;
+  var data = bacaDataStrukManual();
+  gambarStrukManual(canvas, data);
+  var summary = document.getElementById('manualReceiptSummary');
+  if (summary) summary.textContent = rupiah(data.total) + ' • ' + data.status;
+}
+
+function strukManualSafeText(value, fallback) {
+  var text = String(value || '').trim();
+  return text || fallback || '-';
+}
+
+function strukManualRoundRect(ctx, x, y, w, h, r) {
+  r = Math.min(r || 0, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function strukManualWrapText(ctx, text, maxWidth, maxLines) {
+  var words = String(text || '').split(/\s+/).filter(Boolean);
+  var lines = [];
+  var line = '';
+  words.forEach(function(word) {
+    var test = line ? line + ' ' + word : word;
+    if (ctx.measureText(test).width <= maxWidth || !line) {
+      line = test;
+    } else {
+      lines.push(line);
+      line = word;
+    }
+  });
+  if (line) lines.push(line);
+  if (!lines.length) lines.push('-');
+  if (maxLines && lines.length > maxLines) {
+    lines = lines.slice(0, maxLines);
+    while (lines[lines.length - 1].length > 3 && ctx.measureText(lines[lines.length - 1] + '...').width > maxWidth) {
+      lines[lines.length - 1] = lines[lines.length - 1].slice(0, -1);
+    }
+    lines[lines.length - 1] += '...';
+  }
+  return lines;
+}
+
+function strukManualDrawLabel(ctx, label, value, x, y, w) {
+  ctx.fillStyle = '#74829f';
+  ctx.font = '700 20px "DM Sans", Arial, sans-serif';
+  ctx.fillText(label, x, y);
+  ctx.fillStyle = '#f3f7ff';
+  ctx.font = '800 26px "DM Sans", Arial, sans-serif';
+  strukManualWrapText(ctx, value, w, 1).forEach(function(line, idx) {
+    ctx.fillText(line, x, y + 34 + (idx * 28));
+  });
+}
+
+function gambarStrukManual(canvas, data) {
+  data = data || {};
+  var width = 1080;
+  var itemLines = [];
+  var ctx = canvas.getContext('2d');
+  ctx.font = '700 26px "DM Sans", Arial, sans-serif';
+  (data.items || []).forEach(function(item) {
+    itemLines.push(strukManualWrapText(ctx, item.nama || 'Item', 370, 2));
+  });
+  var rowsHeight = itemLines.reduce(function(sum, lines) { return sum + Math.max(72, 34 + (lines.length * 26)); }, 0);
+  var noteLines = strukManualWrapText(ctx, data.catatan || 'Terima kasih.', 830, 4);
+  var tableYBase = 486;
+  var rowGaps = (data.items || []).length ? (data.items || []).length * 10 : 0;
+  var rowsEndY = (data.items || []).length ? tableYBase + 72 + rowsHeight + rowGaps : tableYBase + 152;
+  var noteStartY = rowsEndY + 248;
+  var height = Math.max(1120, noteStartY + (noteLines.length * 34) + 112);
+  canvas.width = width;
+  canvas.height = height;
+  canvas.style.aspectRatio = width + ' / ' + height;
+  ctx = canvas.getContext('2d');
+
+  var bg = ctx.createLinearGradient(0, 0, width, height);
+  bg.addColorStop(0, '#07111f');
+  bg.addColorStop(0.55, '#0a1324');
+  bg.addColorStop(1, '#10192b');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.fillStyle = 'rgba(0,255,153,0.16)';
+  ctx.fillRect(0, 0, width, 10);
+  ctx.fillStyle = 'rgba(0,213,255,0.10)';
+  ctx.fillRect(0, 10, width, 4);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.045)';
+  strukManualRoundRect(ctx, 54, 54, width - 108, height - 108, 30);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  ctx.fillStyle = '#f5f8ff';
+  ctx.font = '900 48px "Syne", "DM Sans", Arial, sans-serif';
+  ctx.fillText(strukManualSafeText(data.brand, 'MoneyTrack Store'), 84, 128);
+  ctx.fillStyle = '#90a0bd';
+  ctx.font = '700 21px "DM Sans", Arial, sans-serif';
+  ctx.fillText('Nota pembayaran manual', 86, 166);
+
+  var statusColor = data.status === 'Lunas' ? '#45f3ff' : '#ffcf66';
+  ctx.fillStyle = 'rgba(0,213,255,0.10)';
+  if (data.status !== 'Lunas') ctx.fillStyle = 'rgba(255,159,67,0.12)';
+  strukManualRoundRect(ctx, 760, 78, 230, 112, 22);
+  ctx.fill();
+  ctx.strokeStyle = data.status === 'Lunas' ? 'rgba(69,243,255,0.38)' : 'rgba(255,159,67,0.38)';
+  ctx.stroke();
+  ctx.fillStyle = statusColor;
+  ctx.font = '900 42px "Syne", "DM Sans", Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(strukManualSafeText(data.status, 'Lunas').toUpperCase(), 875, 145);
+  ctx.fillStyle = '#8fa0bd';
+  ctx.font = '700 18px "DM Sans", Arial, sans-serif';
+  ctx.fillText('Status', 875, 172);
+  ctx.textAlign = 'left';
+
+  ctx.fillStyle = 'rgba(255,255,255,0.035)';
+  strukManualRoundRect(ctx, 84, 220, 906, 132, 22);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.09)';
+  ctx.stroke();
+  strukManualDrawLabel(ctx, 'Invoice', strukManualSafeText(data.invoiceId, '-'), 112, 260, 250);
+  strukManualDrawLabel(ctx, 'Tanggal', tanggalIndo(data.tanggal) + (data.waktu ? ' ' + data.waktu : ''), 392, 260, 240);
+  strukManualDrawLabel(ctx, 'Pembeli', strukManualSafeText(data.pelanggan, 'Pelanggan'), 664, 260, 300);
+
+  ctx.fillStyle = 'rgba(0,255,153,0.10)';
+  strukManualRoundRect(ctx, 84, 374, 906, 70, 18);
+  ctx.fill();
+  ctx.fillStyle = '#cfe4ff';
+  ctx.font = '800 21px "DM Sans", Arial, sans-serif';
+  ctx.fillText('Metode: ' + strukManualSafeText(data.metode, '-'), 114, 418);
+  ctx.textAlign = 'right';
+  ctx.fillText(data.nomorWa ? 'WA ' + data.nomorWa : 'Nomor WA: -', 960, 418);
+  ctx.textAlign = 'left';
+
+  var tableX = 84;
+  var tableY = 486;
+  var tableW = 906;
+  ctx.fillStyle = 'rgba(255,255,255,0.06)';
+  strukManualRoundRect(ctx, tableX, tableY, tableW, 54, 16);
+  ctx.fill();
+  ctx.fillStyle = '#7f8fad';
+  ctx.font = '900 18px "DM Sans", Arial, sans-serif';
+  ctx.fillText('ITEM', tableX + 28, tableY + 34);
+  ctx.fillText('QTY', tableX + 488, tableY + 34);
+  ctx.fillText('HARGA', tableX + 594, tableY + 34);
+  ctx.textAlign = 'right';
+  ctx.fillText('TOTAL', tableX + tableW - 28, tableY + 34);
+  ctx.textAlign = 'left';
+
+  var y = tableY + 72;
+  if (!(data.items || []).length) {
+    ctx.fillStyle = '#91a0bb';
+    ctx.font = '700 24px "DM Sans", Arial, sans-serif';
+    ctx.fillText('Belum ada item.', tableX + 28, y + 34);
+    y += 80;
+  } else {
+    (data.items || []).forEach(function(item, idx) {
+      var lines = itemLines[idx] || ['Item'];
+      var rowH = Math.max(72, 34 + (lines.length * 26));
+      ctx.fillStyle = idx % 2 ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.12)';
+      strukManualRoundRect(ctx, tableX, y - 8, tableW, rowH, 14);
+      ctx.fill();
+      ctx.fillStyle = '#f6f9ff';
+      ctx.font = '800 24px "DM Sans", Arial, sans-serif';
+      lines.forEach(function(line, lineIdx) {
+        ctx.fillText(line, tableX + 28, y + 22 + (lineIdx * 26));
+      });
+      if (item.diskon) {
+        ctx.fillStyle = '#ffcf66';
+        ctx.font = '700 17px "DM Sans", Arial, sans-serif';
+        ctx.fillText('Diskon item ' + rupiah(item.diskon), tableX + 28, y + rowH - 12);
+      }
+      ctx.fillStyle = '#dfe7f7';
+      ctx.font = '800 22px "DM Sans", Arial, sans-serif';
+      ctx.fillText(formatQtyStruk(item.qty), tableX + 490, y + 24);
+      ctx.fillText(rupiah(item.hargaSatuan), tableX + 594, y + 24);
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#45f3ff';
+      ctx.fillText(rupiah(item.total), tableX + tableW - 28, y + 24);
+      ctx.textAlign = 'left';
+      y += rowH + 10;
+    });
+  }
+
+  var sumY = y + 22;
+  ctx.fillStyle = 'rgba(255,255,255,0.04)';
+  strukManualRoundRect(ctx, 540, sumY, 450, 178, 22);
+  ctx.fill();
+  function rowSummary(label, value, offset, color) {
+    ctx.fillStyle = '#7d8ba8';
+    ctx.font = '700 20px "DM Sans", Arial, sans-serif';
+    ctx.fillText(label, 570, sumY + offset);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = color || '#f3f7ff';
+    ctx.font = '900 24px "DM Sans", Arial, sans-serif';
+    ctx.fillText(rupiah(value), 956, sumY + offset);
+    ctx.textAlign = 'left';
+  }
+  rowSummary('Subtotal', data.subtotal, 42);
+  rowSummary('Diskon', data.diskon, 82, '#ffcf66');
+  rowSummary('Pajak/Biaya', data.pajak, 122);
+  ctx.fillStyle = 'rgba(0,255,153,0.14)';
+  strukManualRoundRect(ctx, 562, sumY + 134, 406, 52, 16);
+  ctx.fill();
+  ctx.fillStyle = '#00130b';
+  ctx.font = '900 22px "DM Sans", Arial, sans-serif';
+  ctx.fillText('TOTAL', 584, sumY + 168);
+  ctx.textAlign = 'right';
+  ctx.font = '900 28px "Syne", "DM Sans", Arial, sans-serif';
+  ctx.fillText(rupiah(data.total), 944, sumY + 168);
+  ctx.textAlign = 'left';
+
+  var noteY = sumY + 226;
+  ctx.fillStyle = '#91a1bf';
+  ctx.font = '700 22px "DM Sans", Arial, sans-serif';
+  noteLines.forEach(function(line, idx) {
+    ctx.fillText(line, 90, noteY + (idx * 30));
+  });
+
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#5f6e89';
+  ctx.font = '700 18px "DM Sans", Arial, sans-serif';
+  ctx.fillText('Struk manual dibuat di MoneyTrack. Data ini tidak disimpan ke database.', width / 2, height - 86);
+  ctx.textAlign = 'left';
+}
+
+function downloadStrukManual() {
+  var canvas = document.getElementById('manualReceiptCanvas');
+  if (!canvas) return;
+  var data = bacaDataStrukManual();
+  if (!data.items.length) {
+    showToast('Isi minimal satu item dulu.', 'warning');
+    return;
+  }
+  gambarStrukManual(canvas, data);
+  var fileName = (data.invoiceId || 'struk-manual').replace(/[^\w-]+/g, '-').toLowerCase() + '.png';
+  function simpan(url) {
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+  if (canvas.toBlob) {
+    canvas.toBlob(function(blob) {
+      if (!blob) {
+        simpan(canvas.toDataURL('image/png'));
+        return;
+      }
+      var url = URL.createObjectURL(blob);
+      simpan(url);
+      setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+    }, 'image/png');
+  } else {
+    simpan(canvas.toDataURL('image/png'));
+  }
+  showToast('Struk manual diunduh sebagai gambar.', 'success');
 }
 
 function modalTambahTransaksi() {
